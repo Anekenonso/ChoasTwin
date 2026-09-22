@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[project]
+name = "chaostwin"
+version = "1.0.0"
+description = "Autonomous Adversarial QA Swarm & Self-Healing Engine"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "ChaosTwin Team" }]
+
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.28.0",
+    "httpx>=0.27.0",
+    "playwright>=1.42.0",
+    "openai>=1.14.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "rich>=13.7.0",
+    "textual>=0.53.0",
+    "python-dotenv>=1.0.1",
+    "websockets>=12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.1.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-httpx>=0.30.0",
+    "ruff>=0.3.0",
+]
+
+[project.scripts]
+chaostwin = "src.orchestrator:main"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests", "target_app"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]

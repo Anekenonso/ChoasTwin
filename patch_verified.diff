@@ -1,0 +1,86 @@
+--- a/target_app/app.py
++++ b/target_app/app.py
+@@ -1,6 +1,7 @@
+ from __future__ import annotations
+ 
+ import asyncio
++from asyncio import Lock
+ from typing import Any
+ 
+ from fastapi import FastAPI, HTTPException
+@@ -18,6 +19,9 @@
+ inventory: dict[str, int] = {"widget_premium": 1}
+ balance: float = 100.0
+ 
++# Mutex lock to prevent concurrent checkout race conditions.
++_checkout_lock = Lock()
++
+ ITEM_PRICES: dict[str, float] = {"widget_premium": 29.99}
+ 
+ 
+@@ -70,30 +74,31 @@
+     global balance
+ 
+-    # --- Input validation (returns 400, NOT a real bug) ---
+-    if request.item not in inventory:
+-        raise HTTPException(
+-            status_code=400,
+-            detail=f"Unknown item: '{request.item}'. Available: {list(inventory.keys())}",
+-        )
+-
+-    if request.quantity <= 0:
+-        raise HTTPException(
+-            status_code=400,
+-            detail=f"Quantity must be positive, got {request.quantity}.",
+-        )
+-
+-    price = ITEM_PRICES.get(request.item, 0.0)
+-    total_cost = price * request.quantity
+-
+-    # --- STEP 1: Check stock (TOCTOU — Time-of-Check) ---
+-    current_stock = inventory[request.item]
+-
+-    if current_stock < request.quantity:
+-        raise HTTPException(
+-            status_code=400,
+-            detail=f"Insufficient stock for '{request.item}': "
+-            f"requested {request.quantity}, available {current_stock}.",
+-        )
+-
+-    # --- STEP 2: Simulate I/O delay (the race window) ---
+-    await asyncio.sleep(0.05)
+-
+-    # --- STEP 3: Deduct stock (TOCTOU — Time-of-Use) ---
+-    inventory[request.item] -= request.quantity
+-    balance -= total_cost
++    # --- Input validation (outside lock — no shared state access) ---
++    if request.item not in inventory:
++        raise HTTPException(
++            status_code=400,
++            detail=f"Unknown item: '{request.item}'. Available: {list(inventory.keys())}",
++        )
++
++    if request.quantity <= 0:
++        raise HTTPException(
++            status_code=400,
++            detail=f"Quantity must be positive, got {request.quantity}.",
++        )
++
++    price = ITEM_PRICES.get(request.item, 0.0)
++    total_cost = price * request.quantity
++
++    # --- Atomic checkout under lock — eliminates the race condition ---
++    async with _checkout_lock:
++        current_stock = inventory[request.item]
++
++        if current_stock < request.quantity:
++            raise HTTPException(
++                status_code=400,
++                detail=f"Insufficient stock for '{request.item}': "
++                f"requested {request.quantity}, available {current_stock}.",
++            )
++
++        await asyncio.sleep(0.05)
++
++        inventory[request.item] -= request.quantity
++        balance -= total_cost
