@@ -20,19 +20,20 @@ export default function AttacksPage() {
 
   return (
     <div className="attacks-container">
+      {/* Page Header */}
       <div className="page-header">
         <div>
-          <span className="page-tag font-mono">ADVERSARIAL ATTACK SWARM</span>
+          <div className="header-kicker font-mono">ADVERSARIAL ATTACK SWARM</div>
           <h1 className="page-title">Live Attack Vectors & Concurrency Fuzzing</h1>
           <p className="page-sub">
-            Monitoring concurrent API bursts (<code className="font-mono">asyncio.gather</code>) and Playwright UI chaos actions.
+            Monitoring concurrent API bursts (<code className="code-pill font-mono">asyncio.gather</code>) and Playwright UI chaos actions.
           </p>
         </div>
 
         <div className="filter-stats-badge">
           <span className="filter-icon">🔍</span>
           <div>
-            <div className="filter-title">Invariant Filter Status</div>
+            <div className="filter-title font-mono">INVARIANT FILTER STATUS</div>
             <div className="filter-val font-mono">
               840 benign 4xx dropped • 18 critical 5xx forwarded
             </div>
@@ -40,6 +41,7 @@ export default function AttacksPage() {
         </div>
       </div>
 
+      {/* KPI Metric Grid */}
       <div className="kpi-grid">
         <KPICard
           title="Active Fuzzer Workers"
@@ -88,10 +90,10 @@ export default function AttacksPage() {
         <div className="inspect-card">
           <div className="card-top">
             <h3 className="card-title">API Fuzzer Concurrent Burst Spec</h3>
-            <span className="badge badge-error font-mono">25 Workers</span>
+            <span className="badge badge-rose font-mono">25 Workers</span>
           </div>
           <p className="card-desc">
-            Burst strategy triggers check-then-act window in target <code className="font-mono">reserve_stock</code> endpoint.
+            Burst strategy triggers check-then-act window in target <code className="code-pill font-mono">reserve_stock</code> endpoint.
           </p>
 
           <pre className="code-box font-mono">
@@ -118,18 +120,19 @@ assert final_stock >= 0, f"Invariant breached: stock = {final_stock}"`}
             <span className="badge badge-cyan font-mono">8-Step Budget</span>
           </div>
           <p className="card-desc">
-            Accessibility locator navigation (<code className="font-mono">get_by_role</code>) simulating erratic user interactions.
+            Headless browser agent stress testing client DOM state transitions and race conditions.
           </p>
 
           <div className="steps-list">
-            {uiAttackSteps.map((st) => (
-              <div key={st.step} className="step-row">
-                <span className="step-num font-mono">#{st.step}</span>
+            {uiAttackSteps.map((s) => (
+              <div key={s.step} className="step-row">
+                <span className="step-num font-mono">0{s.step}</span>
                 <div className="step-content">
                   <div className="step-action font-mono">
-                    <strong className="text-cyan">{st.action}</strong> → {st.locator}
+                    <span className="text-cyan font-bold">{s.action}</span>
+                    <span className="step-locator text-muted"> → {s.locator}</span>
                   </div>
-                  <div className="step-res">{st.result}</div>
+                  <div className="step-res">{s.result}</div>
                 </div>
               </div>
             ))}
@@ -141,73 +144,82 @@ assert final_stock >= 0, f"Invariant breached: stock = {final_stock}"`}
         .attacks-container {
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 28px;
         }
 
         .page-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
+          align-items: flex-end;
           gap: 16px;
+          flex-wrap: wrap;
         }
 
-        .page-tag {
+        .header-kicker {
           font-size: 10px;
-          color: #00d4ff;
           font-weight: 700;
-          letter-spacing: 1px;
-          display: block;
-          margin-bottom: 6px;
-        }
-
-        .page-title {
-          font-size: 22px;
-          font-weight: 800;
-          color: #ffffff;
+          color: var(--accent-rose);
+          letter-spacing: 0.12em;
           margin-bottom: 4px;
         }
 
+        .page-title {
+          font-size: 24px;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          color: var(--text-primary);
+        }
+
         .page-sub {
-          font-size: 13px;
-          color: #8b949e;
+          font-size: 13.5px;
+          color: var(--text-secondary);
+          margin-top: 4px;
+        }
+
+        .code-pill {
+          background: rgba(255, 255, 255, 0.05);
+          color: var(--accent-cyan);
+          padding: 2px 6px;
+          border-radius: var(--radius-xs);
         }
 
         .filter-stats-badge {
           display: flex;
           align-items: center;
-          gap: 12px;
-          background: rgba(46, 213, 115, 0.08);
-          border: 1px solid rgba(46, 213, 115, 0.25);
+          gap: 10px;
+          background: rgba(14, 21, 36, 0.85);
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-md);
           padding: 10px 16px;
-          border-radius: 10px;
         }
 
         .filter-icon {
-          font-size: 20px;
+          font-size: 18px;
         }
 
         .filter-title {
-          font-size: 11px;
-          color: #2ed573;
+          font-size: 9.5px;
           font-weight: 700;
+          color: var(--text-muted);
+          letter-spacing: 0.1em;
         }
 
         .filter-val {
-          font-size: 11px;
-          color: #e6edf3;
+          font-size: 11.5px;
+          color: var(--accent-cyan);
+          font-weight: 600;
         }
 
         .kpi-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 16px;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 18px;
         }
 
         .inspect-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 20px;
+          gap: 24px;
         }
 
         @media (max-width: 1000px) {
@@ -217,13 +229,14 @@ assert final_stock >= 0, f"Invariant breached: stock = {final_stock}"`}
         }
 
         .inspect-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-radius: 12px;
-          padding: 20px;
+          background: linear-gradient(180deg, rgba(14, 21, 36, 0.9) 0%, rgba(10, 16, 28, 0.95) 100%);
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-lg);
+          padding: 22px;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 14px;
+          box-shadow: var(--shadow-card);
         }
 
         .card-top {
@@ -233,28 +246,26 @@ assert final_stock >= 0, f"Invariant breached: stock = {final_stock}"`}
         }
 
         .card-title {
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 700;
-          color: #ffffff;
+          color: var(--text-primary);
         }
 
         .card-desc {
           font-size: 12px;
-          color: #8b949e;
-          margin: 0;
-          line-height: 1.4;
+          color: var(--text-secondary);
+          line-height: 1.5;
         }
 
         .code-box {
-          background: #06090e;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 8px;
+          background: #05080e;
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-sm);
           padding: 14px;
           font-size: 11px;
-          color: #7ee787;
-          line-height: 1.5;
+          color: #a7f3d0;
+          line-height: 1.55;
           overflow-x: auto;
-          margin: 0;
         }
 
         .steps-list {
@@ -268,15 +279,16 @@ assert final_stock >= 0, f"Invariant breached: stock = {final_stock}"`}
         .step-row {
           display: flex;
           gap: 12px;
-          background: rgba(0, 0, 0, 0.25);
-          padding: 8px 12px;
-          border-radius: 6px;
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: rgba(8, 12, 20, 0.5);
+          padding: 10px 12px;
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border-subtle);
         }
 
         .step-num {
-          font-size: 11px;
-          color: #8b949e;
+          font-size: 10.5px;
+          color: var(--text-muted);
+          font-weight: 700;
         }
 
         .step-content {
@@ -286,18 +298,20 @@ assert final_stock >= 0, f"Invariant breached: stock = {final_stock}"`}
         }
 
         .step-action {
-          font-size: 11px;
-          color: #ffffff;
+          font-size: 11.5px;
+        }
+
+        .step-locator {
+          color: var(--text-secondary);
         }
 
         .step-res {
-          font-size: 10px;
-          color: #8b949e;
+          font-size: 11px;
+          color: var(--text-muted);
         }
 
-        .text-cyan {
-          color: #00d4ff;
-        }
+        .text-cyan { color: var(--accent-cyan); }
+        .text-muted { color: var(--text-muted); }
       `}</style>
     </div>
   );

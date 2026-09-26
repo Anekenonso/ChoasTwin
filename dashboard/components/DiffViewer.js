@@ -1,6 +1,10 @@
 'use client';
 
+import { useState } from 'react';
+
 export default function DiffViewer({ patch }) {
+  const [copied, setCopied] = useState(false);
+
   const defaultDiff = `--- target_app/app.py (Original)
 +++ target_app/app.py (Self-Healed)
 @@ -12,6 +12,7 @@
@@ -33,9 +37,15 @@ export default function DiffViewer({ patch }) {
 
   const lines = (currentPatch.diff || defaultDiff).split('\n');
 
+  const handleCopyDiff = () => {
+    navigator.clipboard?.writeText(currentPatch.diff || defaultDiff);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="diff-viewer-card">
-      {/* Diff Header */}
+      {/* Header */}
       <div className="diff-header">
         <div className="diff-title-box">
           <span className="diff-file-icon">📄</span>
@@ -46,72 +56,67 @@ export default function DiffViewer({ patch }) {
         </div>
 
         <div className="diff-badges">
-          <div className="badge badge-success">
-            <span>🛡️ Anti-Lazy AST:</span>
-            <span className="font-mono">VALIDATED (0 pass/no-op)</span>
+          <div className="badge badge-success font-mono">
+            <span>🛡️ AST MUTEX:</span>
+            <span>VALIDATED</span>
           </div>
-          <div className="badge badge-purple">
+          <div className="badge badge-purple font-mono">
             <span>TTFT:</span>
-            <span className="font-mono">{currentPatch.ttftMs || 240}ms</span>
+            <span>{currentPatch.ttftMs || 240}ms</span>
           </div>
+          <button onClick={handleCopyDiff} className="copy-btn font-mono">
+            {copied ? '✔ Copied' : 'Copy Patch'}
+          </button>
         </div>
       </div>
 
-      {/* Explanation Banner */}
-      {currentPatch.explanation && (
-        <div className="explanation-banner">
-          <span className="explanation-icon">💡</span>
-          <p className="explanation-text">{currentPatch.explanation}</p>
-        </div>
-      )}
+      {/* Rationale Banner */}
+      <div className="explanation-banner">
+        <div className="expl-tag font-mono">NEBIUS REASONING RATIONALE</div>
+        <p className="expl-text">{currentPatch.explanation}</p>
+      </div>
 
-      {/* Code Window */}
-      <div className="code-window">
-        <div className="code-topbar">
-          <span className="dot dot-red" />
-          <span className="dot dot-yellow" />
-          <span className="dot dot-green" />
-          <span className="window-title font-mono">unified-diff.patch</span>
-        </div>
+      {/* Code Diff Box */}
+      <div className="diff-box font-mono">
+        {lines.map((line, idx) => {
+          let lineType = 'normal';
+          if (line.startsWith('+') && !line.startsWith('+++')) lineType = 'add';
+          else if (line.startsWith('-') && !line.startsWith('---')) lineType = 'del';
+          else if (line.startsWith('@@')) lineType = 'chunk';
 
-        <pre className="diff-content font-mono">
-          {lines.map((line, idx) => {
-            let lineClass = 'line-context';
-            if (line.startsWith('+') && !line.startsWith('+++')) {
-              lineClass = 'line-added';
-            } else if (line.startsWith('-') && !line.startsWith('---')) {
-              lineClass = 'line-removed';
-            } else if (line.startsWith('@@')) {
-              lineClass = 'line-chunk';
-            }
-
-            return (
-              <div key={idx} className={`diff-line ${lineClass}`}>
-                <span className="line-num">{idx + 1}</span>
-                <span className="line-text">{line}</span>
-              </div>
-            );
-          })}
-        </pre>
+          return (
+            <div key={idx} className={`diff-line diff-${lineType}`}>
+              <span className="line-num">{idx + 1}</span>
+              <span className="line-symbol">
+                {lineType === 'add' ? '+' : lineType === 'del' ? '-' : ' '}
+              </span>
+              <span className="line-content">
+                {lineType === 'add' || lineType === 'del' ? line.slice(1) : line}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
       <style jsx>{`
         .diff-viewer-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-radius: 12px;
+          background: linear-gradient(180deg, rgba(14, 21, 36, 0.9) 0%, rgba(10, 16, 28, 0.95) 100%);
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-lg);
           padding: 20px;
           display: flex;
           flex-direction: column;
-          gap: 14px;
+          gap: 16px;
+          box-shadow: var(--shadow-card);
+          backdrop-filter: blur(16px);
         }
 
         .diff-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          flex-wrap: wrap;
           gap: 12px;
+          flex-wrap: wrap;
         }
 
         .diff-title-box {
@@ -125,14 +130,14 @@ export default function DiffViewer({ patch }) {
         }
 
         .diff-filename {
-          font-size: 14px;
+          font-size: 13.5px;
           font-weight: 700;
-          color: #ffffff;
+          color: var(--text-primary);
         }
 
         .diff-meta {
           font-size: 11px;
-          color: #8b949e;
+          color: var(--text-muted);
         }
 
         .diff-badges {
@@ -141,114 +146,106 @@ export default function DiffViewer({ patch }) {
           gap: 8px;
         }
 
-        .badge-purple {
-          background: rgba(168, 85, 247, 0.12);
-          border: 1px solid rgba(168, 85, 247, 0.3);
-          color: #c084fc;
-          font-size: 11px;
+        .copy-btn {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--border-default);
+          color: var(--text-secondary);
           padding: 4px 10px;
-          border-radius: 6px;
-          display: flex;
-          gap: 6px;
+          border-radius: var(--radius-xs);
+          font-size: 11px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all var(--transition-fast);
+        }
+
+        .copy-btn:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: var(--text-primary);
         }
 
         .explanation-banner {
+          background: rgba(56, 189, 248, 0.06);
+          border: 1px solid rgba(56, 189, 248, 0.2);
+          border-radius: var(--radius-md);
+          padding: 12px 16px;
           display: flex;
-          align-items: flex-start;
-          gap: 10px;
-          background: rgba(0, 212, 255, 0.05);
-          border: 1px solid rgba(0, 212, 255, 0.2);
-          border-radius: 8px;
-          padding: 10px 14px;
+          flex-direction: column;
+          gap: 4px;
         }
 
-        .explanation-icon {
-          font-size: 16px;
+        .expl-tag {
+          font-size: 10px;
+          font-weight: 700;
+          color: var(--accent-cyan);
+          letter-spacing: 0.1em;
         }
 
-        .explanation-text {
+        .expl-text {
           font-size: 12px;
-          color: #c9d1d9;
+          color: var(--text-primary);
           line-height: 1.5;
-          margin: 0;
         }
 
-        .code-window {
-          background: #06090e;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 8px;
-          overflow: hidden;
-        }
-
-        .code-topbar {
-          background: #0d1117;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-          padding: 8px 14px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .dot {
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-        }
-
-        .dot-red { background: #ff5f56; }
-        .dot-yellow { background: #ffbd2e; }
-        .dot-green { background: #27c93f; }
-
-        .window-title {
-          font-size: 11px;
-          color: #6e7681;
-          margin-left: 8px;
-        }
-
-        .diff-content {
-          padding: 12px 0;
-          margin: 0;
-          font-size: 12px;
-          line-height: 1.5;
+        .diff-box {
+          background: #05080e;
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-md);
           overflow-x: auto;
+          font-size: 11.5px;
+          line-height: 1.6;
         }
 
         .diff-line {
           display: flex;
-          padding: 1px 12px;
-          gap: 14px;
+          padding: 2px 10px;
         }
 
         .line-num {
-          color: #484f58;
-          width: 28px;
+          width: 32px;
+          color: var(--text-faint);
+          user-select: none;
+          font-size: 10.5px;
           text-align: right;
+          padding-right: 12px;
+        }
+
+        .line-symbol {
+          width: 14px;
+          font-weight: 700;
           user-select: none;
         }
 
-        .line-text {
+        .line-content {
           flex: 1;
+          white-space: pre;
         }
 
-        .line-added {
-          background: rgba(46, 213, 115, 0.15);
-          color: #2ed573;
-          border-left: 3px solid #2ed573;
+        .diff-normal {
+          color: var(--text-secondary);
         }
 
-        .line-removed {
-          background: rgba(255, 71, 87, 0.15);
-          color: #ff4757;
-          border-left: 3px solid #ff4757;
+        .diff-add {
+          background: rgba(16, 185, 129, 0.12);
+          color: #6ee7b7;
         }
 
-        .line-chunk {
-          color: #00d4ff;
-          background: rgba(0, 212, 255, 0.06);
+        .diff-add .line-symbol {
+          color: #34d399;
         }
 
-        .line-context {
-          color: #c9d1d9;
+        .diff-del {
+          background: rgba(244, 63, 94, 0.12);
+          color: #fca5a5;
+        }
+
+        .diff-del .line-symbol {
+          color: #f87171;
+        }
+
+        .diff-chunk {
+          background: rgba(99, 102, 241, 0.1);
+          color: #a5b4fc;
+          font-weight: 600;
         }
       `}</style>
     </div>

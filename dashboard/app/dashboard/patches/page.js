@@ -48,9 +48,10 @@ export default function PatchesPage() {
 
   return (
     <div className="patches-container">
+      {/* Header */}
       <div className="page-header">
         <div>
-          <span className="page-tag font-mono">RECON & SELF-HEALING ENGINE</span>
+          <div className="header-kicker font-mono">RECON & SELF-HEALING ENGINE</div>
           <h1 className="page-title">Recon Intelligence & Autonomous Patches</h1>
           <p className="page-sub">
             Observer telemetry compression, Tavily CVE intelligence, and Nebius DeepSeek-R1 anti-lazy code generation.
@@ -58,14 +59,15 @@ export default function PatchesPage() {
         </div>
 
         <div className="model-chip-large">
-          <span className="chip-badge">AI Core</span>
+          <span className="chip-badge font-mono">AI CORE</span>
           <div className="chip-info font-mono">
-            <span className="text-white">deepseek-ai/DeepSeek-R1</span>
+            <span className="text-white font-bold">deepseek-ai/DeepSeek-R1</span>
             <span className="text-purple">Nebius Token Factory @ 148.5 tok/s</span>
           </div>
         </div>
       </div>
 
+      {/* KPI Row */}
       <div className="kpi-grid">
         <KPICard
           title="Telemetry Compression"
@@ -98,51 +100,51 @@ export default function PatchesPage() {
           title="Time to First Token"
           value="240ms"
           subtitle="Nebius H100 inference"
-          trend="Ultra Low Latency"
+          trend="Realtime"
           trendType="positive"
           icon="⚡"
           accent="orange"
         />
       </div>
 
-      {/* Main Patch Diff Viewer */}
+      {/* Active Diff Viewer */}
       <DiffViewer patch={swarm.latestPatch} />
 
-      {/* Split Grid: Tavily Recon & Observer Compressed Telemetry */}
+      {/* Intelligence & Telemetry Grid */}
       <div className="intel-grid">
-        {/* Tavily Intelligence Feed */}
+        {/* Tavily Knowledge Extraction */}
         <div className="intel-card">
           <div className="card-top">
             <h3 className="card-title">Tavily CVE & Remediation Intelligence</h3>
-            <span className="badge badge-cyan font-mono">Real-Time Search</span>
+            <span className="badge badge-emerald font-mono">3 Retrieved</span>
           </div>
           <p className="card-desc">
-            Autonomous queries dispatched by TavilyClient to discover remediation patterns for concurrency bugs.
+            Autonomous web search queries synthesized from invariant trace to guide DeepSeek-R1 prompt.
           </p>
 
           <div className="tavily-list">
-            {tavilyResults.map((item, idx) => (
-              <div key={idx} className="tavily-item">
+            {tavilyResults.map((res, i) => (
+              <div key={i} className="tavily-item">
                 <div className="tavily-top">
-                  <a href={item.url} target="_blank" rel="noreferrer" className="tavily-link">
-                    {item.title} ↗
+                  <a href={res.url} target="_blank" rel="noreferrer" className="tavily-link font-mono">
+                    {res.title}
                   </a>
-                  <span className="relevance-badge font-mono">{item.relevance} match</span>
+                  <span className="relevance-badge font-mono">{res.relevance} Match</span>
                 </div>
-                <p className="tavily-snippet">{item.snippet}</p>
+                <p className="tavily-snippet">{res.snippet}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Observer Telemetry Envelope */}
+        {/* Observer Compressed Telemetry Envelope */}
         <div className="intel-card">
           <div className="card-top">
-            <h3 className="card-title">Observer Compressed Telemetry (≤15 Fields)</h3>
-            <span className="badge badge-success font-mono">Compressed</span>
+            <h3 className="card-title">Observer Compressed Telemetry Envelope</h3>
+            <span className="badge badge-cyan font-mono">92.4% Compressed</span>
           </div>
           <p className="card-desc">
-            Raw logs, stack traces, and environment telemetry boiled down to a 15-field JSON payload for LLM prompt efficiency.
+            Raw 8.4KB process logs compressed into token-efficient JSON payload fed to Nebius API.
           </p>
 
           <pre className="json-box font-mono">
@@ -155,76 +157,77 @@ export default function PatchesPage() {
         .patches-container {
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 28px;
         }
 
         .page-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
+          align-items: flex-end;
           gap: 16px;
+          flex-wrap: wrap;
         }
 
-        .page-tag {
+        .header-kicker {
           font-size: 10px;
-          color: #00d4ff;
           font-weight: 700;
-          letter-spacing: 1px;
-          display: block;
-          margin-bottom: 6px;
-        }
-
-        .page-title {
-          font-size: 22px;
-          font-weight: 800;
-          color: #ffffff;
+          color: var(--accent-purple);
+          letter-spacing: 0.12em;
           margin-bottom: 4px;
         }
 
+        .page-title {
+          font-size: 24px;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          color: var(--text-primary);
+        }
+
         .page-sub {
-          font-size: 13px;
-          color: #8b949e;
+          font-size: 13.5px;
+          color: var(--text-secondary);
+          margin-top: 4px;
         }
 
         .model-chip-large {
           display: flex;
           align-items: center;
           gap: 12px;
-          background: rgba(168, 85, 247, 0.1);
-          border: 1px solid rgba(168, 85, 247, 0.3);
-          padding: 8px 16px;
-          border-radius: 10px;
+          background: rgba(14, 21, 36, 0.9);
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-md);
+          padding: 10px 16px;
         }
 
         .chip-badge {
-          background: #a855f7;
-          color: #ffffff;
+          background: var(--accent-purple-soft);
+          color: var(--accent-purple);
+          border: 1px solid rgba(168, 85, 247, 0.3);
           font-size: 10px;
           font-weight: 700;
-          padding: 2px 6px;
-          border-radius: 4px;
+          padding: 3px 8px;
+          border-radius: var(--radius-xs);
         }
 
         .chip-info {
           display: flex;
           flex-direction: column;
-          font-size: 11px;
+          gap: 2px;
         }
 
-        .text-white { color: #ffffff; font-weight: 600; }
-        .text-purple { color: #c084fc; font-size: 10px; }
+        .text-white { color: #ffffff; font-size: 12px; }
+        .text-purple { color: var(--accent-purple); font-size: 10.5px; }
 
         .kpi-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 16px;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 18px;
         }
 
         .intel-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 20px;
+          gap: 24px;
         }
 
         @media (max-width: 1000px) {
@@ -234,13 +237,14 @@ export default function PatchesPage() {
         }
 
         .intel-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-radius: 12px;
-          padding: 20px;
+          background: linear-gradient(180deg, rgba(14, 21, 36, 0.9) 0%, rgba(10, 16, 28, 0.95) 100%);
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-lg);
+          padding: 22px;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 14px;
+          box-shadow: var(--shadow-card);
         }
 
         .card-top {
@@ -250,16 +254,15 @@ export default function PatchesPage() {
         }
 
         .card-title {
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 700;
-          color: #ffffff;
+          color: var(--text-primary);
         }
 
         .card-desc {
           font-size: 12px;
-          color: #8b949e;
-          margin: 0;
-          line-height: 1.4;
+          color: var(--text-secondary);
+          line-height: 1.5;
         }
 
         .tavily-list {
@@ -271,10 +274,10 @@ export default function PatchesPage() {
         }
 
         .tavily-item {
-          background: rgba(0, 0, 0, 0.25);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          border-radius: 8px;
-          padding: 10px 14px;
+          background: rgba(8, 12, 20, 0.5);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-sm);
+          padding: 12px 14px;
           display: flex;
           flex-direction: column;
           gap: 6px;
@@ -288,8 +291,8 @@ export default function PatchesPage() {
 
         .tavily-link {
           font-size: 12px;
-          font-weight: 600;
-          color: #00d4ff;
+          font-weight: 700;
+          color: var(--accent-cyan);
           text-decoration: none;
         }
 
@@ -299,30 +302,30 @@ export default function PatchesPage() {
 
         .relevance-badge {
           font-size: 10px;
-          color: #2ed573;
-          background: rgba(46, 213, 115, 0.1);
+          font-weight: 700;
+          color: var(--accent-emerald);
+          background: var(--accent-emerald-soft);
+          border: 1px solid rgba(16, 185, 129, 0.3);
           padding: 2px 6px;
-          border-radius: 4px;
+          border-radius: var(--radius-xs);
         }
 
         .tavily-snippet {
-          font-size: 11px;
-          color: #8b949e;
-          line-height: 1.4;
-          margin: 0;
+          font-size: 11.5px;
+          color: var(--text-secondary);
+          line-height: 1.45;
         }
 
         .json-box {
-          background: #06090e;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 8px;
-          padding: 12px;
+          background: #05080e;
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-sm);
+          padding: 14px;
           font-size: 11px;
-          color: #00d4ff;
-          line-height: 1.4;
+          color: #38bdf8;
+          line-height: 1.45;
           max-height: 280px;
           overflow-y: auto;
-          margin: 0;
         }
       `}</style>
     </div>

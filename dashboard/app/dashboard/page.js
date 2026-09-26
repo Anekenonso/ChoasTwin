@@ -1,6 +1,7 @@
 'use client';
 
 import { useSwarm } from '../../components/SwarmContext';
+import AuthorityBanner from '../../components/AuthorityBanner';
 import KPICard from '../../components/KPICard';
 import AttackChart from '../../components/AttackChart';
 import DiffViewer from '../../components/DiffViewer';
@@ -12,28 +13,8 @@ export default function DashboardOverview() {
 
   return (
     <div className="overview-container">
-      {/* Top Banner: Swarm State & Mission Status */}
-      <div className="state-banner">
-        <div className="banner-left">
-          <div className="banner-tag">
-            <span className="live-pulse" />
-            <span className="font-mono">LIVE SWARM ORCHESTRATION</span>
-          </div>
-          <h1 className="banner-heading">
-            Target Service: <span className="text-cyan">FastAPI Canary Cluster</span>
-          </h1>
-          <p className="banner-sub">
-            Autonomous adversarial agents actively probing for concurrency race conditions and self-healing with Nebius AI Studio.
-          </p>
-        </div>
-
-        <div className="banner-right">
-          <div className="state-indicator-box">
-            <span className="state-label">Current Pipeline Phase</span>
-            <span className="state-active-pill font-mono">{swarm.state}</span>
-          </div>
-        </div>
-      </div>
+      {/* Top Banner: Authority Boundary Banner (ExceptionLineage-inspired) */}
+      <AuthorityBanner state={swarm.state} />
 
       {/* KPI Cards Row */}
       <div className="kpi-grid">
@@ -75,7 +56,7 @@ export default function DashboardOverview() {
         />
       </div>
 
-      {/* Main Grid: Left (Attacks & Diff) + Right (Verification & Live Log) */}
+      {/* Main Grid: Left (Attacks & Diff) + Right (Verification & Live Trace) */}
       <div className="main-content-grid">
         <div className="content-left">
           {/* Live Attack Waterfall */}
@@ -92,26 +73,40 @@ export default function DashboardOverview() {
           {/* Verification Panel */}
           <VerificationPanel verification={swarm.verification} />
 
-          {/* Swarm Live Event Stream */}
+          {/* Chronological Swarm Activity Trace (Inspired by ExceptionLineage InvestigationActivityTrace) */}
           <div className="event-stream-card">
             <div className="stream-header">
               <div>
+                <div className="stream-kicker font-mono">CHRONOLOGICAL AUDIT TRACE</div>
                 <h3 className="stream-title">Swarm Event Telemetry Stream</h3>
                 <p className="stream-sub">Real-time WebSocket feed from engine:8001</p>
               </div>
-              <span className="badge badge-cyan font-mono">LIVE</span>
+              <span className="badge badge-cyan font-mono">LIVE FEED</span>
             </div>
 
-            <div className="stream-list">
-              {swarm.events?.map((ev, i) => (
-                <div key={i} className="stream-item">
-                  <div className="stream-meta">
-                    <span className="stream-time font-mono">{ev.timestamp}</span>
-                    <span className="stream-phase font-mono">[{ev.state}]</span>
+            <div className="stream-timeline">
+              {swarm.events?.length > 0 ? (
+                swarm.events.map((ev, i) => (
+                  <div key={i} className="timeline-item">
+                    <div className="timeline-node">
+                      <span className="node-dot" />
+                      {i < swarm.events.length - 1 && <span className="node-line" />}
+                    </div>
+
+                    <div className="timeline-content">
+                      <div className="timeline-meta">
+                        <span className="timeline-phase font-mono">[{ev.state}]</span>
+                        <span className="timeline-time font-mono">{ev.timestamp}</span>
+                      </div>
+                      <div className="timeline-msg">{ev.message}</div>
+                    </div>
                   </div>
-                  <div className="stream-msg">{ev.message}</div>
+                ))
+              ) : (
+                <div className="stream-empty font-mono">
+                  <span>Waiting for swarm trigger... (Click Launch Swarm)</span>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
@@ -126,188 +121,149 @@ export default function DashboardOverview() {
         .overview-container {
           display: flex;
           flex-direction: column;
-          gap: 24px;
-        }
-
-        .state-banner {
-          background: linear-gradient(135deg, rgba(0, 212, 255, 0.08) 0%, rgba(13, 17, 23, 0.6) 100%);
-          border: 1px solid rgba(0, 212, 255, 0.2);
-          border-radius: 14px;
-          padding: 24px 28px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          backdrop-filter: blur(16px);
-          flex-wrap: wrap;
-          gap: 16px;
-        }
-
-        .banner-tag {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 10px;
-          color: #00d4ff;
-          font-weight: 700;
-          letter-spacing: 1px;
-          margin-bottom: 8px;
-        }
-
-        .live-pulse {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #00d4ff;
-          box-shadow: 0 0 10px #00d4ff;
-          animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(1.3); }
-        }
-
-        .banner-heading {
-          font-size: 22px;
-          font-weight: 800;
-          color: #ffffff;
-          margin-bottom: 6px;
-        }
-
-        .text-cyan {
-          color: #00d4ff;
-        }
-
-        .banner-sub {
-          font-size: 13px;
-          color: #8b949e;
-          max-width: 600px;
-          line-height: 1.5;
-        }
-
-        .state-indicator-box {
-          background: rgba(0, 0, 0, 0.4);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          padding: 12px 20px;
-          border-radius: 10px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .state-label {
-          font-size: 10px;
-          color: #8b949e;
-          text-transform: uppercase;
-          letter-spacing: 0.6px;
-        }
-
-        .state-active-pill {
-          font-size: 16px;
-          font-weight: 800;
-          color: #00d4ff;
-          letter-spacing: 1px;
+          gap: 28px;
         }
 
         .kpi-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-          gap: 16px;
+          gap: 18px;
         }
 
         .main-content-grid {
           display: grid;
-          grid-template-columns: 1.3fr 1fr;
-          gap: 20px;
+          grid-template-columns: 1.15fr 0.85fr;
+          gap: 24px;
+        }
+
+        .content-left, .content-right {
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+        }
+
+        /* Activity Trace Card */
+        .event-stream-card {
+          background: linear-gradient(180deg, rgba(14, 21, 36, 0.9) 0%, rgba(10, 16, 28, 0.95) 100%);
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-lg);
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+          box-shadow: var(--shadow-card);
+          backdrop-filter: blur(16px);
+        }
+
+        .stream-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          border-bottom: 1px solid var(--border-subtle);
+          padding-bottom: 14px;
+        }
+
+        .stream-kicker {
+          font-size: 10px;
+          font-weight: 700;
+          color: var(--accent-cyan);
+          letter-spacing: 0.12em;
+          margin-bottom: 4px;
+        }
+
+        .stream-title {
+          font-size: 16px;
+          font-weight: 800;
+          color: var(--text-primary);
+        }
+
+        .stream-sub {
+          font-size: 12px;
+          color: var(--text-secondary);
+        }
+
+        .stream-timeline {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          max-height: 380px;
+          overflow-y: auto;
+          padding-right: 6px;
+        }
+
+        .timeline-item {
+          display: flex;
+          gap: 14px;
+          position: relative;
+        }
+
+        .timeline-node {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 14px;
+          flex-shrink: 0;
+        }
+
+        .node-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--accent-cyan);
+          box-shadow: 0 0 8px var(--accent-cyan);
+          margin-top: 4px;
+        }
+
+        .node-line {
+          width: 1px;
+          flex: 1;
+          background: var(--border-default);
+          margin-top: 4px;
+        }
+
+        .timeline-content {
+          background: rgba(8, 12, 20, 0.5);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-sm);
+          padding: 10px 14px;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .timeline-meta {
+          display: flex;
+          justify-content: space-between;
+          font-size: 10.5px;
+        }
+
+        .timeline-phase {
+          color: var(--accent-purple);
+          font-weight: 700;
+        }
+
+        .timeline-time {
+          color: var(--text-muted);
+        }
+
+        .timeline-msg {
+          font-size: 12px;
+          color: var(--text-primary);
+          line-height: 1.45;
+        }
+
+        .stream-empty {
+          padding: 32px 0;
+          text-align: center;
+          font-size: 12px;
+          color: var(--text-muted);
         }
 
         @media (max-width: 1200px) {
           .main-content-grid {
             grid-template-columns: 1fr;
           }
-        }
-
-        .content-left {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-
-        .content-right {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-
-        .event-stream-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-radius: 12px;
-          padding: 20px;
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-        }
-
-        .stream-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .stream-title {
-          font-size: 15px;
-          font-weight: 700;
-          color: #ffffff;
-          margin-bottom: 2px;
-        }
-
-        .stream-sub {
-          font-size: 11px;
-          color: #8b949e;
-        }
-
-        .stream-list {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          max-height: 280px;
-          overflow-y: auto;
-        }
-
-        .stream-item {
-          background: rgba(0, 0, 0, 0.25);
-          border-left: 2px solid #00d4ff;
-          padding: 8px 12px;
-          border-radius: 4px;
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-        }
-
-        .stream-meta {
-          display: flex;
-          gap: 8px;
-          font-size: 10px;
-        }
-
-        .stream-time {
-          color: #6e7681;
-        }
-
-        .stream-phase {
-          color: #00d4ff;
-          font-weight: 600;
-        }
-
-        .stream-msg {
-          font-size: 11px;
-          color: #e6edf3;
-        }
-
-        .incidents-section {
-          margin-top: 4px;
         }
       `}</style>
     </div>

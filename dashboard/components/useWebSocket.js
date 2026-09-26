@@ -105,6 +105,28 @@ export function useSwarmWebSocket() {
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
 
+  const handleSwarmEvent = useCallback((event) => {
+    setData(prev => {
+      const updatedEvents = [
+        {
+          timestamp: new Date().toLocaleTimeString(),
+          state: event.state || prev.state,
+          message: event.message || JSON.stringify(event.data || {}),
+        },
+        ...prev.events.slice(0, 49)
+      ];
+
+      return {
+        ...prev,
+        state: event.state || prev.state,
+        events: updatedEvents,
+        ...(event.data ? event.data : {})
+      };
+    });
+  }, []);
+
+  const connectRef = useRef(null);
+
   const connect = useCallback(() => {
     try {
       if (typeof window === 'undefined') return;
@@ -130,37 +152,25 @@ export function useSwarmWebSocket() {
         setConnectionStatus('disconnected');
         setData(prev => ({ ...prev, connected: false }));
         // Retry connection after 4 seconds
-        reconnectTimeoutRef.current = setTimeout(connect, 4000);
+        reconnectTimeoutRef.current = setTimeout(() => {
+          connectRef.current?.();
+        }, 4000);
       };
 
       ws.onerror = () => {
         setConnectionStatus('error');
         ws.close();
       };
-    } catch (err) {
-      setConnectionStatus('disconnected');
+    } catch {
+      setTimeout(() => {
+        setConnectionStatus('disconnected');
+      }, 0);
     }
-  }, []);
+  }, [handleSwarmEvent]);
 
-  const handleSwarmEvent = (event) => {
-    setData(prev => {
-      const updatedEvents = [
-        {
-          timestamp: new Date().toLocaleTimeString(),
-          state: event.state || prev.state,
-          message: event.message || JSON.stringify(event.data || {}),
-        },
-        ...prev.events.slice(0, 49)
-      ];
-
-      return {
-        ...prev,
-        state: event.state || prev.state,
-        events: updatedEvents,
-        ...(event.data ? event.data : {})
-      };
-    });
-  };
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   useEffect(() => {
     connect();

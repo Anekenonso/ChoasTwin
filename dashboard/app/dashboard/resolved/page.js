@@ -35,20 +35,22 @@ export default function ResolvedPage() {
 
   return (
     <div className="resolved-container">
+      {/* Page Header */}
       <div className="page-header">
         <div>
-          <span className="page-tag font-mono">POST-INCIDENT ARCHIVE</span>
+          <div className="header-kicker font-mono">POST-INCIDENT ARCHIVE</div>
           <h1 className="page-title">Resolved Incidents & Compliance Audit</h1>
           <p className="page-sub">
             Permanent ledger of race conditions discovered, patched, and verified by the ChaosTwin Swarm.
           </p>
         </div>
 
-        <button onClick={exportReport} className="btn-export">
+        <button onClick={exportReport} className="btn-export font-mono">
           {downloaded ? '✔ Exported Report!' : '📥 Export Audit Report (JSON)'}
         </button>
       </div>
 
+      {/* KPI Grid */}
       <div className="kpi-grid">
         <KPICard
           title="Total Resolved"
@@ -93,16 +95,16 @@ export default function ResolvedPage() {
 
       {/* Audit Certificate Box */}
       <div className="cert-card">
-        <div className="cert-badge">SECURITY AUDIT CERTIFICATION</div>
+        <div className="cert-badge font-mono">SECURITY AUDIT CERTIFICATION</div>
         <h3 className="cert-title">ChaosTwin Sandboxed Remediation Guarantee</h3>
         <p className="cert-desc">
           Every remediation patch generated has undergone dual-stage sandbox verification.
-          Code mutations have been verified with zero no-op/empty exception handlers and zero race condition recurrences
-          under sustained 25-worker concurrency bursts.
+          Code mutations have been verified with zero no-op/empty exception handlers and zero race condition recurrences under 25-coroutine concurrent loads.
         </p>
-        <div className="cert-footer font-mono">
-          <span>Engine Hash: <code className="text-cyan">sha256:7f3b890a...</code></span>
-          <span>Verified on Nebius NVIDIA H100 Cluster</span>
+        <div className="cert-meta font-mono">
+          <span>SIGNED BY: ChaosTwin Observer Swarm</span>
+          <span>•</span>
+          <span>COMPLIANCE HASH: 0x9a8f2e41c7b8</span>
         </div>
       </div>
 
@@ -110,106 +112,105 @@ export default function ResolvedPage() {
         .resolved-container {
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 28px;
         }
 
         .page-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
+          align-items: flex-end;
           gap: 16px;
+          flex-wrap: wrap;
         }
 
-        .page-tag {
+        .header-kicker {
           font-size: 10px;
-          color: #00d4ff;
           font-weight: 700;
-          letter-spacing: 1px;
-          display: block;
-          margin-bottom: 6px;
-        }
-
-        .page-title {
-          font-size: 22px;
-          font-weight: 800;
-          color: #ffffff;
+          color: var(--accent-emerald);
+          letter-spacing: 0.12em;
           margin-bottom: 4px;
         }
 
+        .page-title {
+          font-size: 24px;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          color: var(--text-primary);
+        }
+
         .page-sub {
-          font-size: 13px;
-          color: #8b949e;
+          font-size: 13.5px;
+          color: var(--text-secondary);
+          margin-top: 4px;
         }
 
         .btn-export {
-          background: rgba(46, 213, 115, 0.15);
-          border: 1px solid rgba(46, 213, 115, 0.4);
-          color: #2ed573;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--border-default);
+          color: var(--text-primary);
+          padding: 10px 18px;
+          border-radius: var(--radius-sm);
           font-size: 12px;
           font-weight: 700;
-          padding: 10px 18px;
-          border-radius: 8px;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all var(--transition-fast);
         }
 
         .btn-export:hover {
-          background: rgba(46, 213, 115, 0.25);
-          transform: translateY(-1px);
-          box-shadow: 0 0 16px rgba(46, 213, 115, 0.3);
+          background: rgba(255, 255, 255, 0.1);
+          border-color: var(--border-strong);
         }
 
         .kpi-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 16px;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 18px;
         }
 
         .cert-card {
-          background: linear-gradient(135deg, rgba(46, 213, 115, 0.05) 0%, rgba(13, 17, 23, 0.7) 100%);
-          border: 1px solid rgba(46, 213, 115, 0.2);
-          border-radius: 12px;
-          padding: 24px;
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(14, 21, 36, 0.95) 100%);
+          border: 1px solid rgba(16, 185, 129, 0.3);
+          border-radius: var(--radius-lg);
+          padding: 24px 28px;
           display: flex;
           flex-direction: column;
           gap: 10px;
+          box-shadow: var(--shadow-card);
         }
 
         .cert-badge {
+          align-self: flex-start;
           font-size: 10px;
-          color: #2ed573;
-          font-weight: 800;
-          letter-spacing: 1px;
+          font-weight: 700;
+          color: var(--accent-emerald);
+          background: var(--accent-emerald-soft);
+          border: 1px solid rgba(16, 185, 129, 0.3);
+          padding: 3px 8px;
+          border-radius: var(--radius-xs);
+          letter-spacing: 0.1em;
         }
 
         .cert-title {
-          font-size: 16px;
-          font-weight: 700;
-          color: #ffffff;
+          font-size: 17px;
+          font-weight: 800;
+          color: var(--text-primary);
         }
 
         .cert-desc {
-          font-size: 12px;
-          color: #8b949e;
-          line-height: 1.5;
-          margin: 0;
+          font-size: 13px;
+          color: var(--text-secondary);
+          line-height: 1.55;
+          max-width: 800px;
         }
 
-        .cert-footer {
-          display: flex;
-          justify-content: space-between;
+        .cert-meta {
           font-size: 11px;
-          color: #6e7681;
-          margin-top: 8px;
-          padding-top: 12px;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          color: var(--text-muted);
+          display: flex;
+          gap: 12px;
+          padding-top: 10px;
+          border-top: 1px solid var(--border-subtle);
           flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        .text-cyan {
-          color: #00d4ff;
         }
       `}</style>
     </div>

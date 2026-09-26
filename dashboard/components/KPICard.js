@@ -6,33 +6,57 @@ export default function KPICard({
   subtitle,
   trend,
   trendType = 'neutral', // 'positive' | 'negative' | 'neutral'
-  icon = '📊',
+  icon = '⚡',
   accent = 'cyan', // 'cyan' | 'red' | 'green' | 'orange' | 'purple'
 }) {
-  const ACCENT_COLORS = {
-    cyan: '#00d4ff',
-    red: '#ff4757',
-    green: '#2ed573',
-    orange: '#ffa502',
-    purple: '#a855f7',
+  const ACCENTS = {
+    cyan: {
+      color: 'var(--accent-cyan)',
+      bg: 'var(--accent-cyan-soft)',
+      border: 'rgba(56, 189, 248, 0.3)',
+    },
+    red: {
+      color: 'var(--accent-rose)',
+      bg: 'var(--accent-rose-soft)',
+      border: 'rgba(244, 63, 94, 0.3)',
+    },
+    green: {
+      color: 'var(--accent-emerald)',
+      bg: 'var(--accent-emerald-soft)',
+      border: 'rgba(16, 185, 129, 0.3)',
+    },
+    orange: {
+      color: 'var(--accent-amber)',
+      bg: 'var(--accent-amber-soft)',
+      border: 'rgba(245, 158, 11, 0.3)',
+    },
+    purple: {
+      color: 'var(--accent-purple)',
+      bg: 'var(--accent-purple-soft)',
+      border: 'rgba(168, 85, 247, 0.3)',
+    },
   };
 
-  const selectedColor = ACCENT_COLORS[accent] || ACCENT_COLORS.cyan;
+  const selected = ACCENTS[accent] || ACCENTS.cyan;
 
   return (
     <div className="kpi-card">
+      <div className="card-top-accent" style={{ background: selected.color }} />
+      
       <div className="kpi-header">
-        <span className="kpi-title">{title}</span>
-        <span className="kpi-icon">{icon}</span>
+        <span className="kpi-kicker">{title}</span>
+        <span className="kpi-icon-wrap" style={{ background: selected.bg, color: selected.color }}>
+          {icon}
+        </span>
       </div>
 
       <div className="kpi-body">
-        <div className="kpi-value font-mono">{value}</div>
+        <div className="kpi-val font-mono">{value}</div>
       </div>
 
       <div className="kpi-footer">
         {trend && (
-          <span className={`kpi-trend trend-${trendType}`}>
+          <span className={`trend-chip trend-${trendType} font-mono`}>
             {trendType === 'positive' && '↑ '}
             {trendType === 'negative' && '↓ '}
             {trend}
@@ -43,41 +67,39 @@ export default function KPICard({
 
       <style jsx>{`
         .kpi-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-radius: 12px;
+          position: relative;
+          background: linear-gradient(180deg, rgba(17, 24, 39, 0.9) 0%, rgba(13, 19, 33, 0.95) 100%);
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-md);
           padding: 18px 20px;
           display: flex;
           flex-direction: column;
-          gap: 8px;
-          backdrop-filter: blur(12px);
-          transition: all 0.2s ease;
-          position: relative;
+          gap: 12px;
+          box-shadow: var(--shadow-card);
+          backdrop-filter: blur(14px);
+          transition: all var(--transition-normal);
           overflow: hidden;
         }
 
-        .kpi-card::before {
-          content: '';
+        .card-top-accent {
           position: absolute;
           top: 0;
           left: 0;
           right: 0;
           height: 2px;
-          background: ${selectedColor};
-          opacity: 0.6;
-          transition: opacity 0.2s ease;
+          opacity: 0.7;
+          transition: opacity var(--transition-fast);
         }
 
         .kpi-card:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(255, 255, 255, 0.15);
           transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+          border-color: var(--border-strong);
+          box-shadow: var(--shadow-elevated);
         }
 
-        .kpi-card:hover::before {
+        .kpi-card:hover .card-top-accent {
           opacity: 1;
-          box-shadow: 0 0 12px ${selectedColor};
+          box-shadow: 0 0 10px ${selected.color};
         }
 
         .kpi-header {
@@ -86,56 +108,71 @@ export default function KPICard({
           align-items: center;
         }
 
-        .kpi-title {
+        .kpi-kicker {
           font-size: 11px;
-          font-weight: 600;
-          color: #8b949e;
-          text-transform: uppercase;
-          letter-spacing: 0.6px;
-        }
-
-        .kpi-icon {
-          font-size: 16px;
-          opacity: 0.8;
-        }
-
-        .kpi-value {
-          font-size: 26px;
           font-weight: 700;
-          color: #ffffff;
-          letter-spacing: -0.5px;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          color: var(--text-secondary);
+        }
+
+        .kpi-icon-wrap {
+          width: 28px;
+          height: 28px;
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+        }
+
+        .kpi-body {
+          margin-top: -2px;
+        }
+
+        .kpi-val {
+          font-size: 26px;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          color: var(--text-primary);
         }
 
         .kpi-footer {
           display: flex;
           align-items: center;
           gap: 8px;
-          font-size: 11px;
+          flex-wrap: wrap;
         }
 
-        .kpi-trend {
-          font-weight: 600;
-          padding: 1px 6px;
-          border-radius: 4px;
+        .trend-chip {
+          font-size: 10.5px;
+          font-weight: 700;
+          padding: 2px 7px;
+          border-radius: var(--radius-xs);
+          letter-spacing: 0.02em;
         }
 
         .trend-positive {
-          color: #2ed573;
-          background: rgba(46, 213, 115, 0.1);
+          background: var(--accent-emerald-soft);
+          color: var(--accent-emerald);
+          border: 1px solid rgba(16, 185, 129, 0.25);
         }
 
         .trend-negative {
-          color: #ff4757;
-          background: rgba(255, 71, 87, 0.1);
+          background: var(--accent-rose-soft);
+          color: var(--accent-rose);
+          border: 1px solid rgba(244, 63, 94, 0.25);
         }
 
         .trend-neutral {
-          color: #8b949e;
           background: rgba(255, 255, 255, 0.05);
+          color: var(--text-secondary);
+          border: 1px solid var(--border-subtle);
         }
 
         .kpi-sub {
-          color: #6e7681;
+          font-size: 11.5px;
+          color: var(--text-muted);
         }
       `}</style>
     </div>

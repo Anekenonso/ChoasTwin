@@ -20,9 +20,10 @@ export default function VerifyPage() {
 
   return (
     <div className="verify-container">
+      {/* Page Header */}
       <div className="page-header">
         <div>
-          <span className="page-tag font-mono">SANDBOXED QUALITY GATE</span>
+          <div className="header-kicker font-mono">SANDBOXED QUALITY GATE</div>
           <h1 className="page-title">Two-Stage Verification & Anti-Regression</h1>
           <p className="page-sub">
             Validating patches in a sandboxed target instance before committing changes to production branches.
@@ -32,12 +33,13 @@ export default function VerifyPage() {
         <button
           onClick={triggerVerification}
           disabled={isRunning}
-          className="btn-rerun"
+          className="btn-rerun font-mono"
         >
           {isRunning ? '⏳ Running Suite...' : '▶ Re-Run Verification Suite'}
         </button>
       </div>
 
+      {/* KPI Grid */}
       <div className="kpi-grid">
         <KPICard
           title="Stage 1: Unit Tests"
@@ -85,7 +87,7 @@ export default function VerifyPage() {
         <div className="detail-card">
           <div className="card-top">
             <h3 className="card-title">Stage 1 Test Log (pytest execution)</h3>
-            <span className="badge badge-success font-mono">0.42s execution</span>
+            <span className="badge badge-emerald font-mono">0.42s execution</span>
           </div>
           <pre className="terminal-box font-mono">
 {`============================= test session starts =============================
@@ -98,27 +100,24 @@ target_app/test_target.py::test_single_reservation PASSED              [ 66%]
 target_app/test_target.py::test_insufficient_stock_rejection PASSED    [100%]
 
 ============================== 3 passed in 0.42s ==============================
-STATUS: Zero functional regressions detected.`}
+Regression status: CLEAN. Mutex does not alter standard functional flows.`}
           </pre>
         </div>
 
         <div className="detail-card">
           <div className="card-top">
-            <h3 className="card-title">Stage 2 Re-Fuzz Audit (25-Burst Verification)</h3>
-            <span className="badge badge-cyan font-mono">25 Concurrent Workers</span>
+            <h3 className="card-title">Stage 2 Re-Fuzz Telemetry (Adversarial Proof)</h3>
+            <span className="badge badge-cyan font-mono">25-Coroutines Verified</span>
           </div>
           <pre className="terminal-box font-mono">
-{`[APIConcurrencyFuzzer] Deploying 25-burst verification attack...
-[Worker Pool] Concurrency burst: 25 requests sent to /api/v1/inventory/reserve
-[Response Analysis]
-  - HTTP 200 (Reserved): 10 requests
-  - HTTP 409 (Out of Stock / Mutex Rejected): 15 requests
-  - HTTP 500 (Unhandled / Race Condition): 0 requests
-[Invariant Evaluation]
-  - Expected remaining stock: 0
-  - Actual remaining stock: 0
-  - Invariant: (stock >= 0) is TRUE
-STATUS: MUTEX LOCK IS 100% EXPLOIT-RESISTANT.`}
+{`[APIConcurrencyFuzzer] Re-attacking patched FastAPI canary...
+Dispatching 25 concurrent requests: /api/v1/inventory/reserve (quantity=1)
+Results:
+- 10 Accepted (200 OK) -> Stock reduced from 10 to 0
+- 15 Rejected (409 Conflict) -> "Insufficient stock"
+- 0 Invariant Breaches (stock never dropped < 0)
+Final Stock: 0 (PASSED: assert stock >= 0)
+Adversarial Resistance: 100%`}
           </pre>
         </div>
       </div>
@@ -127,54 +126,53 @@ STATUS: MUTEX LOCK IS 100% EXPLOIT-RESISTANT.`}
         .verify-container {
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 28px;
         }
 
         .page-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
+          align-items: flex-end;
           gap: 16px;
+          flex-wrap: wrap;
         }
 
-        .page-tag {
+        .header-kicker {
           font-size: 10px;
-          color: #00d4ff;
           font-weight: 700;
-          letter-spacing: 1px;
-          display: block;
-          margin-bottom: 6px;
-        }
-
-        .page-title {
-          font-size: 22px;
-          font-weight: 800;
-          color: #ffffff;
+          color: var(--accent-emerald);
+          letter-spacing: 0.12em;
           margin-bottom: 4px;
         }
 
+        .page-title {
+          font-size: 24px;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          color: var(--text-primary);
+        }
+
         .page-sub {
-          font-size: 13px;
-          color: #8b949e;
+          font-size: 13.5px;
+          color: var(--text-secondary);
+          margin-top: 4px;
         }
 
         .btn-rerun {
-          background: linear-gradient(135deg, #00d4ff, #0066ff);
-          border: none;
+          background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+          border: 1px solid rgba(56, 189, 248, 0.4);
           color: #ffffff;
+          padding: 10px 18px;
+          border-radius: var(--radius-sm);
           font-size: 12px;
           font-weight: 700;
-          padding: 10px 18px;
-          border-radius: 8px;
           cursor: pointer;
-          box-shadow: 0 0 16px rgba(0, 212, 255, 0.35);
-          transition: all 0.2s ease;
+          transition: all var(--transition-fast);
         }
 
         .btn-rerun:hover:not(:disabled) {
+          filter: brightness(1.1);
           transform: translateY(-1px);
-          box-shadow: 0 0 24px rgba(0, 212, 255, 0.5);
         }
 
         .btn-rerun:disabled {
@@ -184,14 +182,14 @@ STATUS: MUTEX LOCK IS 100% EXPLOIT-RESISTANT.`}
 
         .kpi-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 16px;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 18px;
         }
 
         .details-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 20px;
+          gap: 24px;
         }
 
         @media (max-width: 1000px) {
@@ -201,13 +199,14 @@ STATUS: MUTEX LOCK IS 100% EXPLOIT-RESISTANT.`}
         }
 
         .detail-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-radius: 12px;
-          padding: 20px;
+          background: linear-gradient(180deg, rgba(14, 21, 36, 0.9) 0%, rgba(10, 16, 28, 0.95) 100%);
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-lg);
+          padding: 22px;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 14px;
+          box-shadow: var(--shadow-card);
         }
 
         .card-top {
@@ -217,22 +216,20 @@ STATUS: MUTEX LOCK IS 100% EXPLOIT-RESISTANT.`}
         }
 
         .card-title {
-          font-size: 14px;
+          font-size: 14.5px;
           font-weight: 700;
-          color: #ffffff;
+          color: var(--text-primary);
         }
 
         .terminal-box {
-          background: #06090e;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 8px;
+          background: #05080e;
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-sm);
           padding: 14px;
           font-size: 11px;
-          color: #7ee787;
-          line-height: 1.5;
+          color: #a7f3d0;
+          line-height: 1.55;
           overflow-x: auto;
-          margin: 0;
-          white-space: pre-wrap;
         }
       `}</style>
     </div>

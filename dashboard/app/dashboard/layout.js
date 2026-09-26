@@ -24,16 +24,24 @@ function DashboardContent({ children }) {
         .dashboard-shell {
           display: flex;
           min-height: 100vh;
-          background: #0a0e17;
+          background: var(--bg-canvas);
         }
 
         .dashboard-main {
           flex: 1;
-          margin-left: 240px;
-          margin-top: 60px;
-          padding: 28px 32px 48px;
+          margin-left: var(--sidebar-width);
+          margin-top: var(--header-height);
+          padding: 32px 36px 64px;
           max-width: 1600px;
-          width: calc(100% - 240px);
+          width: calc(100% - var(--sidebar-width));
+        }
+
+        @media (max-width: 768px) {
+          .dashboard-main {
+            margin-left: 0;
+            padding: 20px 16px;
+            width: 100%;
+          }
         }
       `}</style>
     </div>

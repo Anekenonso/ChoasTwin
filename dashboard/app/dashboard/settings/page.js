@@ -19,16 +19,17 @@ export default function SettingsPage() {
 
   return (
     <div className="settings-container">
+      {/* Header */}
       <div className="page-header">
         <div>
-          <span className="page-tag font-mono">SWARM ENGINE CONFIGURATION</span>
+          <div className="header-kicker font-mono">SWARM ENGINE CONFIGURATION</div>
           <h1 className="page-title">ChaosTwin System Settings</h1>
           <p className="page-sub">
             Configure target endpoints, Nebius AI models, Tavily intelligence, and swarm fuzzing parameters.
           </p>
         </div>
 
-        <button onClick={handleSave} className="btn-save">
+        <button onClick={handleSave} className="btn-save font-mono">
           {saved ? '✔ Settings Saved' : '💾 Save Changes'}
         </button>
       </div>
@@ -40,25 +41,25 @@ export default function SettingsPage() {
           <p className="card-desc">Network addresses for canary target service and swarm orchestrator.</p>
 
           <div className="form-group">
-            <label>Target Application Base URL</label>
+            <label className="font-mono">Target Application Base URL</label>
             <input
               type="text"
               value={targetUrl}
               onChange={(e) => setTargetUrl(e.target.value)}
-              className="font-mono"
+              className="font-mono input-field"
             />
-            <span className="field-hint">Default canary target runs at port 8000</span>
+            <span className="field-hint font-mono">Default canary target runs at port 8000</span>
           </div>
 
           <div className="form-group">
-            <label>Swarm Engine Orchestrator URL</label>
+            <label className="font-mono">Swarm Engine Orchestrator URL</label>
             <input
               type="text"
               value={engineUrl}
               onChange={(e) => setEngineUrl(e.target.value)}
-              className="font-mono"
+              className="font-mono input-field"
             />
-            <span className="field-hint">FastAPI WebSocket and REST server at port 8001</span>
+            <span className="field-hint font-mono">FastAPI WebSocket and REST server at port 8001</span>
           </div>
         </div>
 
@@ -68,7 +69,7 @@ export default function SettingsPage() {
           <p className="card-desc">Token factory model parameters for patch generation.</p>
 
           <div className="form-group">
-            <label>Primary Reasoning Model</label>
+            <label className="font-mono">Primary Reasoning Model</label>
             <select
               value={nebiusModel}
               onChange={(e) => setNebiusModel(e.target.value)}
@@ -78,18 +79,18 @@ export default function SettingsPage() {
               <option value="meta-llama/Llama-3.3-70B-Instruct">meta-llama/Llama-3.3-70B-Instruct (Fast)</option>
               <option value="Qwen/Qwen2.5-Coder-32B-Instruct">Qwen/Qwen2.5-Coder-32B-Instruct</option>
             </select>
-            <span className="field-hint">Served via Nebius Studio with token/s tracking</span>
+            <span className="field-hint font-mono">Served via Nebius Studio with token/s tracking</span>
           </div>
 
           <div className="form-group">
-            <label>Nebius API Key</label>
+            <label className="font-mono">Nebius API Key</label>
             <input
               type="password"
               value="••••••••••••••••••••••••••••••"
               disabled
-              className="font-mono"
+              className="font-mono input-field input-disabled"
             />
-            <span className="field-hint">Configured via .env (NEBIUS_API_KEY)</span>
+            <span className="field-hint font-mono">Configured via .env (NEBIUS_API_KEY)</span>
           </div>
         </div>
 
@@ -99,66 +100,51 @@ export default function SettingsPage() {
           <p className="card-desc">Control concurrent worker volume and chaos attack parameters.</p>
 
           <div className="form-group">
-            <div className="slider-label-row">
-              <label>API Fuzzer Burst Size</label>
-              <span className="slider-val font-mono text-cyan">{burstSize} Workers</span>
+            <div className="label-with-val">
+              <label className="font-mono">Burst Concurrency Size</label>
+              <span className="slider-val font-mono">{burstSize} Coroutines</span>
             </div>
             <input
               type="range"
               min="5"
-              max="100"
-              step="5"
+              max="50"
               value={burstSize}
               onChange={(e) => setBurstSize(Number(e.target.value))}
-              className="range-input"
+              className="slider-input"
             />
-            <span className="field-hint">
-              Dispatches {burstSize} concurrent coroutines via <code className="font-mono">asyncio.gather</code>
-            </span>
+            <span className="field-hint font-mono">Parallel async requests fired in single event loop tick</span>
           </div>
 
-          <div className="form-group">
-            <label>UI Chaos Budget (Playwright)</label>
+          <div className="checkbox-row">
             <input
-              type="number"
-              defaultValue={8}
-              min={3}
-              max={20}
-              className="font-mono"
+              type="checkbox"
+              id="antiLazy"
+              checked={strictAntiLazy}
+              onChange={(e) => setStrictAntiLazy(e.target.checked)}
             />
-            <span className="field-hint">Maximum interactive mutations before telemetry capture</span>
+            <label htmlFor="antiLazy" className="checkbox-label">
+              <strong>Strict Anti-Lazy AST Validation</strong>
+              <span>Reject patches containing empty pass, bare except, or placeholder comments.</span>
+            </label>
           </div>
         </div>
 
-        {/* Security & Anti-Lazy Rules */}
+        {/* Demo & Fallbacks */}
         <div className="setting-card">
-          <h3 className="card-title">Anti-Lazy & Safety Policies</h3>
-          <p className="card-desc">Enforce code quality standards on autonomous patch generation.</p>
+          <h3 className="card-title">Canary Simulation & Fallbacks</h3>
+          <p className="card-desc">Safety nets for offline evaluation and offline demo presentations.</p>
 
-          <div className="toggle-group">
-            <div>
-              <div className="toggle-title">Strict Anti-Lazy AST Validator</div>
-              <div className="toggle-desc">Automatically reject patches containing `except: pass` or no-op handlers.</div>
-            </div>
+          <div className="checkbox-row">
             <input
               type="checkbox"
-              checked={strictAntiLazy}
-              onChange={(e) => setStrictAntiLazy(e.target.checked)}
-              className="toggle-box"
-            />
-          </div>
-
-          <div className="toggle-group">
-            <div>
-              <div className="toggle-title">Offline Mock Mode Fallback</div>
-              <div className="toggle-desc">Gracefully simulate Nebius & Tavily responses if API keys are absent.</div>
-            </div>
-            <input
-              type="checkbox"
+              id="mockFallback"
               checked={mockFallback}
               onChange={(e) => setMockFallback(e.target.checked)}
-              className="toggle-box"
             />
+            <label htmlFor="mockFallback" className="checkbox-label">
+              <strong>Enable High-Fidelity Simulation Fallback</strong>
+              <span>Use realistic race condition heuristics if Nebius or Canary is temporarily offline.</span>
+            </label>
           </div>
         </div>
       </form>
@@ -167,89 +153,82 @@ export default function SettingsPage() {
         .settings-container {
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 28px;
         }
 
         .page-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
+          align-items: flex-end;
           gap: 16px;
+          flex-wrap: wrap;
         }
 
-        .page-tag {
+        .header-kicker {
           font-size: 10px;
-          color: #00d4ff;
           font-weight: 700;
-          letter-spacing: 1px;
-          display: block;
-          margin-bottom: 6px;
-        }
-
-        .page-title {
-          font-size: 22px;
-          font-weight: 800;
-          color: #ffffff;
+          color: var(--accent-cyan);
+          letter-spacing: 0.12em;
           margin-bottom: 4px;
         }
 
+        .page-title {
+          font-size: 24px;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          color: var(--text-primary);
+        }
+
         .page-sub {
-          font-size: 13px;
-          color: #8b949e;
+          font-size: 13.5px;
+          color: var(--text-secondary);
+          margin-top: 4px;
         }
 
         .btn-save {
-          background: linear-gradient(135deg, #00d4ff, #0066ff);
-          border: none;
+          background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+          border: 1px solid rgba(56, 189, 248, 0.4);
           color: #ffffff;
+          padding: 10px 20px;
+          border-radius: var(--radius-sm);
           font-size: 12px;
           font-weight: 700;
-          padding: 10px 20px;
-          border-radius: 8px;
           cursor: pointer;
-          box-shadow: 0 0 16px rgba(0, 212, 255, 0.35);
-          transition: all 0.2s ease;
+          transition: all var(--transition-fast);
         }
 
         .btn-save:hover {
+          filter: brightness(1.1);
           transform: translateY(-1px);
-          box-shadow: 0 0 24px rgba(0, 212, 255, 0.5);
         }
 
         .settings-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-        }
-
-        @media (max-width: 1000px) {
-          .settings-grid {
-            grid-template-columns: 1fr;
-          }
+          grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+          gap: 24px;
         }
 
         .setting-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-radius: 12px;
+          background: linear-gradient(180deg, rgba(14, 21, 36, 0.9) 0%, rgba(10, 16, 28, 0.95) 100%);
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-lg);
           padding: 24px;
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 18px;
+          box-shadow: var(--shadow-card);
         }
 
         .card-title {
-          font-size: 15px;
-          font-weight: 700;
-          color: #ffffff;
+          font-size: 16px;
+          font-weight: 800;
+          color: var(--text-primary);
         }
 
         .card-desc {
           font-size: 12px;
-          color: #8b949e;
-          margin: 0;
-          line-height: 1.4;
+          color: var(--text-secondary);
+          margin-top: -12px;
         }
 
         .form-group {
@@ -259,84 +238,90 @@ export default function SettingsPage() {
         }
 
         .form-group label {
-          font-size: 12px;
-          font-weight: 500;
-          color: #c9d1d9;
+          font-size: 11px;
+          color: var(--text-muted);
+          font-weight: 600;
         }
 
-        .form-group input,
-        .select-input {
+        .input-field {
           background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 8px;
-          padding: 10px 12px;
-          color: #ffffff;
-          font-size: 13px;
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-sm);
+          padding: 9px 12px;
+          color: var(--text-primary);
+          font-size: 12.5px;
+          outline: none;
         }
 
-        .form-group input:focus,
-        .select-input:focus {
-          outline: none;
-          border-color: #00d4ff;
-          box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
+        .input-field:focus {
+          border-color: var(--border-glow-cyan);
+        }
+
+        .input-disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: rgba(0, 0, 0, 0.3);
         }
 
         .select-input {
-          background: #0d1117;
-          cursor: pointer;
+          background: #090e1a;
+          border: 1px solid var(--border-default);
+          border-radius: var(--radius-sm);
+          padding: 9px 12px;
+          color: var(--text-primary);
+          font-size: 12.5px;
+          outline: none;
         }
 
         .field-hint {
-          font-size: 11px;
-          color: #6e7681;
+          font-size: 10.5px;
+          color: var(--text-muted);
         }
 
-        .slider-label-row {
+        .label-with-val {
           display: flex;
           justify-content: space-between;
           align-items: center;
         }
 
         .slider-val {
-          font-size: 12px;
+          font-size: 11.5px;
           font-weight: 700;
+          color: var(--accent-cyan);
         }
 
-        .text-cyan {
-          color: #00d4ff;
-        }
-
-        .range-input {
-          accent-color: #00d4ff;
+        .slider-input {
+          accent-color: var(--accent-cyan);
           cursor: pointer;
         }
 
-        .toggle-group {
+        .checkbox-row {
           display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 10px 0;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          gap: 12px;
+          align-items: flex-start;
+          padding: 12px;
+          background: rgba(8, 12, 20, 0.4);
+          border-radius: var(--radius-sm);
+          border: 1px solid var(--border-subtle);
         }
 
-        .toggle-title {
+        .checkbox-row input {
+          margin-top: 3px;
+          accent-color: var(--accent-cyan);
+        }
+
+        .checkbox-label {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
           font-size: 12px;
-          font-weight: 600;
-          color: #ffffff;
-          margin-bottom: 2px;
-        }
-
-        .toggle-desc {
-          font-size: 11px;
-          color: #8b949e;
-          max-width: 380px;
-        }
-
-        .toggle-box {
-          width: 18px;
-          height: 18px;
-          accent-color: #00d4ff;
+          color: var(--text-primary);
           cursor: pointer;
+        }
+
+        .checkbox-label span {
+          font-size: 11px;
+          color: var(--text-muted);
         }
       `}</style>
     </div>
